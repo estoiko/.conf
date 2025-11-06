@@ -20,9 +20,12 @@ fi
 
 selected_name=$(basename "$selected" | tr . _)
 
-if ! tmux has-session -t "$selected_name"; then
-    tmux new-session -ds "$selected_name" -c "$selected"
-    tmux select-window -t "$selected_name:1"
-fi
+# if ! tmux has-session -t "$selected_name"; then
+#     tmux new-session -ds "$selected_name" -c "$selected"
+#     tmux select-window -t "$selected_name:1"
+# fi
 
-tmux switch-client -t "$selected_name"
+# tmux switch-client -t "$selected_name"
+
+current_session=$(tmux display-message -p '#S')
+tmux new-window -c "$selected" -n "$selected_name"
