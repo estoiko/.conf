@@ -23,7 +23,7 @@ while getopts "frd" opt; do
     *)
       echo "Usage: $0 [-f] [-r] [-d] <directory>"
       exit 1
-      ;;
+      ;; 
   esac
 done
 
@@ -86,4 +86,4 @@ if $DEBUG; then
   echo "INPUT:"
   echo
   leaks -list -atExit -- ./a.out 2>/dev/null
-fi
+fi 
