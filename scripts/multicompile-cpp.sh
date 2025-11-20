@@ -80,10 +80,11 @@ CMD+=" $CPP_FILES "
 # Run compilation
 # -----------------------------
 echo "$CMD" | pbcopy
-eval "$CMD" && echo -e "${LIGHT_PURPLE}COMPILED AS <a.out>${NC}" || echo -e "${RED}COMPILATION ERROR${NC}" && exit 1
+eval "$CMD" && echo -e "${LIGHT_PURPLE}COMPILED AS <a.out>${NC}" \
+  || { echo -e "${RED}COMPILATION ERROR${NC}"; exit 1; }
 
 if $DEBUG; then
   echo "INPUT:"
   echo
   leaks -list -atExit -- ./a.out 2>/dev/null
-fi 
+fi
