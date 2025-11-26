@@ -28,7 +28,7 @@ spinner() {
     printf "\r%s %s" "$msg" "${frames[$((i++ % ${#frames[@]}))]}"
     sleep "$delay"
   done
-  # printf "\r%s... done\n" "$msg"
+  printf "\r%s... done\n" "$msg"
 }
 
 # -----------------------------
@@ -77,7 +77,7 @@ fi
 CPP_FILES=$(echo "$CPP_FILES" | sed 's/ *$//')
 
 if [ -z "$CPP_FILES" ]; then
-  echo -e "${RED}No .cpp files found.${RED}"
+  echo -e "${RED}No .cpp files found.${NC}"
   exit 1
 fi
 
@@ -94,20 +94,16 @@ if $DEBUG; then
   CMD+=" -g"
 fi
 
-CMD+=" $CPP_FILES "
+CMD+=" $CPP_FILES -o \"$DIR/a.out\""
 
 # -----------------------------
 # Run compilation
 # -----------------------------
 echo "$CMD" | pbcopy
 
-# eval "$CMD" && echo -e "${LIGHT_PURPLE}COMPILED AS - < a.out >${NC}" \
-#   || { echo -e "${RED}COMPILATION ERROR${NC}"; exit 1; }
-
 eval "$CMD" &
 compile_pid=$!
 spinner "COMPILING" "$compile_pid"
-echo
 
 if ! wait "$compile_pid"; then
   echo -e "${RED}COMPILATION ERROR${NC}"
@@ -116,24 +112,22 @@ fi
 
 echo -e "${LIGHT_PURPLE}COMPILED AS - < a.out >${NC}"
 
-
+# -----------------------------
+# Execution handling
+# -----------------------------
 if $DEBUG; then
   echo
+  cd "$DIR"
   leaks -list -atExit -- ./a.out 2>/dev/null
 elif $EXECUTE; then 
-  tmp_out=$(mktemp)
-  "$DIR"/a.out >"$tmp_out" 2>&1 &
-  run_pid=$!
-
-  spinner "RUNNING" "$run_pid"
-  echo
-
-  wait "$run_pid"
+  echo -e "${GREEN}RUNNING PROGRAM:${NC}"
+  cd "$DIR"
+  
+  ./a.out
   status=$?
-
-  echo 
-  cat "$tmp_out"
-  rm -f "$tmp_out"
-
-  exit "$status"
+  
+  if [ $status -ne 0 ]; then
+    echo -e "${RED}PROGRAM EXITED WITH STATUS: $status${NC}"
+    exit $status
+  fi
 fi
